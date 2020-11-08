@@ -36,7 +36,7 @@ public class DeleteCategoryServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		CategoryDAO.instance.deleteCategory(request.getParameter("category"));
+		CategoryDAO.instance.deleteCategory(request.getParameter("category"), request.getParameter("user"));
 		request.getRequestDispatcher("admin.jsp").forward(request, response);
 	}
 

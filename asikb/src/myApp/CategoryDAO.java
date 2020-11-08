@@ -71,7 +71,7 @@ public enum CategoryDAO {
 		}
 	}
 
-	public void deleteCategory(String category) {
+	public void deleteCategory(String category, String user) {
 		Connection connection = Utils.getConnection();
 
 		try {
@@ -79,6 +79,7 @@ public enum CategoryDAO {
 			psmt.setString(1, category);
 			psmt.executeUpdate();
 			loadFromDB();
+			AuditDAO.instance.addEntry("Category deleted. Name: '" + category + "'", user);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

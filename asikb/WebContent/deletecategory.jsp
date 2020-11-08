@@ -121,6 +121,7 @@
 					<h4>Delete Category</h4>
 					<p class="text-muted">Choose a category to delete</p>
 					<form method="post" action="DeleteCategoryServlet" id="DeleteCategory">
+					<input value="${sessionScope.user.getUsername()}" type="text" id="user" name="user" hidden>
 						<div class="form-group">
 							<label for="category">Category</label>
 							<select id="category" name="category" class="form-control" readonly>
