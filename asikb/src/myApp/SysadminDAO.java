@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dao.Email;
 import dao.Utils;
 
 public enum SysadminDAO {
@@ -24,17 +25,14 @@ public enum SysadminDAO {
 		sysadminMap.clear();
 		try {
 			Connection connection = Utils.getConnection();
-
 			PreparedStatement psmt = connection.prepareStatement("SELECT adminuser, adminemail FROM sysinfo");
-
 			ResultSet rs = psmt.executeQuery();
-
 			while (rs.next()) {
 				Sysadmin u = new Sysadmin(rs.getString("adminuser"), rs.getString("adminemail"));
 				sysadminMap.put(sysadminMap.size() + 1, u);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to load sys admin information from the database", e.getMessage());
 		}
 		return sysadminMap;
 		
@@ -48,7 +46,6 @@ public enum SysadminDAO {
 
 	public void editSysadmin(String username, String email) {
 		Connection connection = Utils.getConnection();
-
 		try {
 			PreparedStatement psmt = connection.prepareStatement("UPDATE sysinfo SET adminuser = ?, adminemail = ?");
 			psmt.setString(1, username);
@@ -56,8 +53,7 @@ public enum SysadminDAO {
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to edit sys admin information", e.getMessage());
 		}
 	}
-
 }

@@ -15,30 +15,25 @@ import dao.Utils;
 public enum UserDAO {
 	instance;
 	private Map<Integer, User> userMap = new HashMap<Integer, User>();
-	
+
 	private UserDAO() {
 		loadFromDB();
 	}
-	
+
 	public Map<Integer, User> loadFromDB() {
 		userMap.clear();
 		try {
 			Connection connection = Utils.getConnection();
-
-			PreparedStatement psmt = connection
-					.prepareStatement("SELECT * FROM users");
-
+			PreparedStatement psmt = connection.prepareStatement("SELECT * FROM users");
 			ResultSet rs = psmt.executeQuery();
-
 			while (rs.next()) {
-				User u = new User(rs.getString("username"),
-						rs.getString("password"), rs.getString("firstnames"),
-						rs.getString("surname"), rs.getString("canadd"),
-						rs.getString("canedit"), rs.getString("isadmin"));
+				User u = new User(rs.getString("username"), rs.getString("password"), rs.getString("firstnames"),
+						rs.getString("surname"), rs.getString("canadd"), rs.getString("canedit"),
+						rs.getString("isadmin"));
 				userMap.put(userMap.size() + 1, u);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to load users from the database", e.getMessage());
 		}
 		return userMap;
 	}
@@ -46,7 +41,6 @@ public enum UserDAO {
 	public User checkLogin(String username, String password) {
 		Connection connection = Utils.getConnection();
 		User user = null;
-
 		try {
 			PreparedStatement psmt = connection
 					.prepareStatement("SELECT * FROM users WHERE USERNAME = ? AND PASSWORD = ?");
@@ -54,26 +48,21 @@ public enum UserDAO {
 			psmt.setString(2, password);
 			ResultSet rs = psmt.executeQuery();
 			if (rs.next()) {
-				user = new User(rs.getString("username"),
-						rs.getString("password"),
-						rs.getString("firstnames"),
-						rs.getString("surname"),
-						rs.getString("canadd"),
-						rs.getString("canedit"),
+				user = new User(rs.getString("username"), rs.getString("password"), rs.getString("firstnames"),
+						rs.getString("surname"), rs.getString("canadd"), rs.getString("canedit"),
 						rs.getString("isadmin"));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "User login failed", e.getMessage());
 		}
 		return user;
 	}
-	
+
 	public User save(User user, String user2) {
 		Connection connection = Utils.getConnection();
 
 		try {
-			PreparedStatement psmt = connection
-					.prepareStatement("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)");
+			PreparedStatement psmt = connection.prepareStatement("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)");
 			psmt.setString(1, user.getUsername());
 			psmt.setString(2, user.getPassword());
 			psmt.setString(3, user.getFirstnames());
@@ -85,7 +74,7 @@ public enum UserDAO {
 			loadFromDB();
 			AuditDAO.instance.addEntry("New user added. Username: '" + user.getUsername() + "'", user2);
 		} catch (SQLException e) {
-			Email.instance.sendErrorEmail(e, "ASIKB - Error adding new user", "User '" + user2 + "' encountered the following error when trying to add a new user");
+			Email.instance.sendErrorEmail(e, "Failed to create user", e.getMessage());
 		}
 		return user;
 	}
@@ -98,10 +87,9 @@ public enum UserDAO {
 
 	public void editUser(User user) {
 		Connection connection = Utils.getConnection();
-
 		try {
-			PreparedStatement psmt = connection
-					.prepareStatement("UPDATE users set firstnames = ?, surname = ?, canadd = ?, canedit = ?, isadmin = ? where username = ?");
+			PreparedStatement psmt = connection.prepareStatement(
+					"UPDATE users set firstnames = ?, surname = ?, canadd = ?, canedit = ?, isadmin = ? where username = ?");
 			psmt.setString(1, user.getFirstnames());
 			psmt.setString(2, user.getSurname());
 			psmt.setString(3, user.getCanadd());
@@ -111,34 +99,32 @@ public enum UserDAO {
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to edit user", e.getMessage());
 		}
 	}
 
 	public void deleteUser(String username) {
 		Connection connection = Utils.getConnection();
 		try {
-			PreparedStatement psmt = connection
-					.prepareStatement("DELETE FROM users WHERE username = ?");
+			PreparedStatement psmt = connection.prepareStatement("DELETE FROM users WHERE username = ?");
 			psmt.setString(1, username);
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to delete user", e.getMessage());
 		}
 	}
 
 	public void editUserPassword(String username, String password) {
 		Connection connection = Utils.getConnection();
 		try {
-			PreparedStatement psmt = connection
-					.prepareStatement("UPDATE users SET password = ? WHERE username = ?");
+			PreparedStatement psmt = connection.prepareStatement("UPDATE users SET password = ? WHERE username = ?");
 			psmt.setString(1, password);
 			psmt.setString(2, username);
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed editing user password", e.getMessage());
 		}
 	}
 }

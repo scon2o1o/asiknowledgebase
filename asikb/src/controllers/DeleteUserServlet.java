@@ -9,25 +9,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import myApp.UserDAO;
 
-/**
- * Servlet implementation class DeleteUserServlet
- */
 @WebServlet("/DeleteUserServlet")
 public class DeleteUserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public DeleteUserServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public DeleteUserServlet() {
+		super();
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		UserDAO.instance.deleteUser(request.getParameter("username"));
 		request.getRequestDispatcher("users.jsp").forward(request, response);
 	}

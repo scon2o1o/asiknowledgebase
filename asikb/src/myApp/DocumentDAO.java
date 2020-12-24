@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dao.Email;
 import dao.Utils;
 
 public enum DocumentDAO {
@@ -23,17 +24,14 @@ public enum DocumentDAO {
 		docsMap.clear();
 		try {
 			Connection connection = Utils.getConnection();
-
 			PreparedStatement psmt = connection.prepareStatement("SELECT * FROM docs order by dateadded desc");
-
 			ResultSet rs = psmt.executeQuery();
-
 			while (rs.next()) {
 				Document d = new Document(rs.getInt("id"), rs.getString("name"), rs.getString("details"), rs.getString("url"), rs.getString("category"), rs.getString("dateadded"), rs.getString("author"), rs.getInt("likes"), rs.getString("lastmodified"), rs.getString("subcategory"));
 				docsMap.put(docsMap.size() + 1, d);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to load documents from the database", e.getMessage());
 		}
 		return docsMap;
 	}
@@ -42,24 +40,20 @@ public enum DocumentDAO {
 		docsMap.clear();
 		try {
 			Connection connection = Utils.getConnection();
-
 			PreparedStatement psmt = connection.prepareStatement("SELECT * FROM docs order by dateadded desc limit 10");
-
 			ResultSet rs = psmt.executeQuery();
-
 			while (rs.next()) {
 				Document d = new Document(rs.getInt("id"), rs.getString("name"), rs.getString("details"), rs.getString("url"), rs.getString("category"), rs.getString("dateadded"), rs.getString("author"), rs.getInt("likes"), rs.getString("lastmodified"), rs.getString("subcategory"));
 				docsMap.put(docsMap.size() + 1, d);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to load documents from the database", e.getMessage());
 		}
 		return docsMap;
 	}
 
 	public Document save(Document doc, String user) {
 		Connection connection = Utils.getConnection();
-
 		try {
 			PreparedStatement psmt = connection.prepareStatement("INSERT INTO docs VALUES (?, ?, ?, ?, ?, current_timestamp(), ?, 0, current_timestamp(), ?)");
 			psmt.setInt(1, doc.getId());
@@ -79,7 +73,7 @@ public enum DocumentDAO {
 				AuditDAO.instance.addEntry("New document '" + doc.getName() + "' added. Document ID: " + id, user);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to save new document", e.getMessage());
 		}
 		return doc;
 	}
@@ -99,7 +93,6 @@ public enum DocumentDAO {
 
 	public void deleteDoc(Integer id, String user, String name) {
 		Connection connection = Utils.getConnection();
-
 		try {
 			PreparedStatement psmt = connection.prepareStatement("DELETE FROM docs WHERE id = ?");
 			psmt.setInt(1, id);
@@ -107,13 +100,12 @@ public enum DocumentDAO {
 			loadFromDB();
 			AuditDAO.instance.addEntry("Document '" + name + "' deleted. Document ID: " + id, user);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to delete document", e.getMessage());
 		}
 	}
 
 	public void editDoc(Integer id, String name, String details, String url, String category, String subcategory) {
 		Connection connection = Utils.getConnection();
-
 		try {
 			PreparedStatement psmt = connection.prepareStatement("UPDATE docs SET name = ?, details = ?, url = ?, lastmodified = current_timestamp(), category = ?, subcategory = ? WHERE id = ?");
 			psmt.setString(1, name);
@@ -125,27 +117,25 @@ public enum DocumentDAO {
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to edit document", e.getMessage());
 		}
 
 	}
 
 	public void likeDoc(int id, String username) {
 		Connection connection = Utils.getConnection();
-
 		try {
 			PreparedStatement psmt2 = connection.prepareStatement("INSERT INTO docslikes VALUES (?, ?, current_timestamp())");
 			psmt2.setInt(1, id);
 			psmt2.setString(2, username);
 			psmt2.executeUpdate();
-
 			PreparedStatement psmt = connection.prepareStatement("update docs set likes = (select count(*) from docslikes where id = ?) where id = ?;");
 			psmt.setInt(1, id);
 			psmt.setInt(2, id);
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to like document", e.getMessage());
 		}
 	}
 }

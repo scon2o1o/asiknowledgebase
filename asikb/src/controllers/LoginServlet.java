@@ -21,20 +21,17 @@ public class LoginServlet extends HttpServlet {
 		super();
 	}
 
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		User user = UserDAO.instance.checkLogin(username, password);
 		if (user != null) {
 			HttpSession session = request.getSession();
 			session.setAttribute("user", user);
-			request.getRequestDispatcher("index.jsp")
-					.forward(request, response);
-			AuditDAO.instance.addEntry("User login", user.getUsername());
+			request.getRequestDispatcher("index.jsp").forward(request, response);
 		} else {
-			request.getRequestDispatcher("login.jsp")
-					.forward(request, response);
+			request.getRequestDispatcher("login.jsp").forward(request, response);
 		}
 	}
 }

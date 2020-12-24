@@ -14,5 +14,4 @@ public class SMTPResource {
 	public List<SMTP> getSMTPSettings() {
 		return SMTPDAO.instance.getSMTPSettings();
 	}
-
 }

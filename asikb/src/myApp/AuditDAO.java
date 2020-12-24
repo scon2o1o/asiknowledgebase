@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dao.Email;
 import dao.Utils;
 
 public enum AuditDAO {
@@ -18,26 +19,23 @@ public enum AuditDAO {
 	private AuditDAO() {
 		loadFromDB();
 	}
-	
+
 	public Map<Integer, Audit> loadFromDB() {
 		auditMap.clear();
 		try {
 			Connection connection = Utils.getConnection();
-
 			PreparedStatement psmt = connection.prepareStatement("SELECT * FROM audit ORDER BY datetime DESC");
-
 			ResultSet rs = psmt.executeQuery();
-
 			while (rs.next()) {
 				Audit a = new Audit(rs.getString("datetime"), rs.getString("action"), rs.getString("user"));
 				auditMap.put(auditMap.size() + 1, a);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to load audit trail from the database", e.getMessage());
 		}
 		return auditMap;
 	}
-	
+
 	public List<Audit> getAuditLog() {
 		List<Audit> auditLog = new ArrayList<Audit>();
 		auditLog.addAll(auditMap.values());
@@ -46,17 +44,15 @@ public enum AuditDAO {
 
 	public void addEntry(String action, String user) {
 		Connection connection = Utils.getConnection();
-
 		try {
-			PreparedStatement psmt = connection.prepareStatement("INSERT INTO audit VALUES (current_timestamp(), ?, ?)");
+			PreparedStatement psmt = connection
+					.prepareStatement("INSERT INTO audit VALUES (current_timestamp(), ?, ?)");
 			psmt.setString(1, action);
 			psmt.setString(2, user);
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to add new entry to the audit trail", e.getMessage());
 		}
-		
 	}
-
 }

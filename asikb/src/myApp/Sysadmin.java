@@ -36,7 +36,4 @@ public class Sysadmin {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	
-
 }

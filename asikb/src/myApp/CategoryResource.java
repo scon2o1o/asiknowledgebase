@@ -14,5 +14,4 @@ public class CategoryResource {
 	public List<Category> getCategories() {
 		return CategoryDAO.instance.getCategories();
 	}
-
 }

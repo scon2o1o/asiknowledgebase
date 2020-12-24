@@ -14,5 +14,4 @@ public class SubcategoryResource {
 	public List<Subcategory> getSubcategories() {
 		return SubcategoryDAO.instance.getSubcategories();
 	}
-
 }

@@ -33,13 +33,16 @@ public enum Email {
 	private SMTP getFromDB() {
 		try {
 			Connection connection = Utils.getConnection();
-			PreparedStatement psmt = connection.prepareStatement("SELECT smtpserver, smtpport, smtpauth, smtpstarttls, smtpfromaddress, smtpusername, smtppassword  FROM sysinfo");
+			PreparedStatement psmt = connection.prepareStatement(
+					"SELECT smtpserver, smtpport, smtpauth, smtpstarttls, smtpfromaddress, smtpusername, smtppassword  FROM sysinfo");
 			ResultSet rs = psmt.executeQuery();
 			while (rs.next()) {
-				account = new SMTP(rs.getString("smtpserver"), rs.getInt("smtpport"), rs.getString("smtpauth"), rs.getString("smtpstarttls"), rs.getString("smtpfromaddress"), rs.getString("smtpusername"), rs.getString("smtppassword"));
+				account = new SMTP(rs.getString("smtpserver"), rs.getInt("smtpport"), rs.getString("smtpauth"),
+						rs.getString("smtpstarttls"), rs.getString("smtpfromaddress"), rs.getString("smtpusername"),
+						rs.getString("smtppassword"));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to get SMTP settings from the database", e.getMessage());
 		}
 		return account;
 	}
@@ -53,7 +56,7 @@ public enum Email {
 				admin = new Sysadmin(rs.getString("adminuser"), rs.getString("adminemail"));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to load sys admin from the database", e.getMessage());
 		}
 		return admin;
 	}

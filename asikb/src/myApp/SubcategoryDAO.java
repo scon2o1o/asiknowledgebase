@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dao.Email;
 import dao.Utils;
 
 public enum SubcategoryDAO {
@@ -23,17 +24,14 @@ public enum SubcategoryDAO {
 		subcategoryMap.clear();
 		try {
 			Connection connection = Utils.getConnection();
-
 			PreparedStatement psmt = connection.prepareStatement("SELECT * FROM subcategories ORDER BY name ASC");
-
 			ResultSet rs = psmt.executeQuery();
-
 			while (rs.next()) {
 				Subcategory c = new Subcategory(rs.getInt("id"), rs.getString("name"));
 				subcategoryMap.put(subcategoryMap.size() + 1, c);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to load subcategories from the database", e.getMessage());
 		}
 		return subcategoryMap;
 	}
@@ -46,7 +44,6 @@ public enum SubcategoryDAO {
 
 	public void addSubcategory(String name, String user) {
 		Connection connection = Utils.getConnection();
-
 		try {
 			PreparedStatement psmt = connection.prepareStatement("INSERT INTO subcategories VALUES (0, ?)");
 			psmt.setString(1, name);
@@ -54,13 +51,12 @@ public enum SubcategoryDAO {
 			loadFromDB();
 			AuditDAO.instance.addEntry("New subcategory added. Name: '" + name + "'", user);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to add subcategory", e.getMessage());
 		}
 	}
 
 	public void editSubcategory(String subcategory, String newname) {
 		Connection connection = Utils.getConnection();
-
 		try {
 			PreparedStatement psmt = connection.prepareStatement("UPDATE subcategories SET name = ? WHERE name = ?");
 			psmt.setString(1, newname);
@@ -68,20 +64,19 @@ public enum SubcategoryDAO {
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to edit subcategory", e.getMessage());
 		}
 	}
 
 	public void deleteSubcategory(String subcategory) {
 		Connection connection = Utils.getConnection();
-
 		try {
 			PreparedStatement psmt = connection.prepareStatement("DELETE FROM subcategories WHERE name = ?");
 			psmt.setString(1, subcategory);
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to delete subcategory", e.getMessage());
 		}
 		
 	}

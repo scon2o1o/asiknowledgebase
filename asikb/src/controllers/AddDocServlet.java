@@ -10,25 +10,16 @@ import javax.servlet.http.HttpServletResponse;
 import myApp.Document;
 import myApp.DocumentDAO;
 
-/**
- * Servlet implementation class AddDocServlet
- */
 @WebServlet("/AddDocServlet")
 public class AddDocServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public AddDocServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public AddDocServlet() {
+		super();
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String name = request.getParameter("name");
 		String details = request.getParameter("details");
 		String url = request.getParameter("url");
@@ -38,11 +29,9 @@ public class AddDocServlet extends HttpServlet {
 		Document doc = new Document(name, details, url, category, author, subcategory);
 		doc = DocumentDAO.instance.save(doc, request.getParameter("user"));
 		if (doc != null) {
-			request.getRequestDispatcher("index.jsp")
-			.forward(request, response);
+			request.getRequestDispatcher("index.jsp").forward(request, response);
 		} else {
-			request.getRequestDispatcher("add.jsp")
-			.forward(request, response);
+			request.getRequestDispatcher("add.jsp").forward(request, response);
 		}
 	}
 

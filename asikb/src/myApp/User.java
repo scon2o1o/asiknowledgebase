@@ -38,12 +38,9 @@ public class User {
 		this.isadmin = isadmin;
 	}
 
-
-
 	public User() {
 		super();
 	}
-
 
 	public String getUsername() {
 		return username;

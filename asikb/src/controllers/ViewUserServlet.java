@@ -10,25 +10,14 @@ import javax.servlet.http.HttpSession;
 
 import myApp.ViewUser;
 
-/**
- * Servlet implementation class ViewUserServlet
- */
 @WebServlet("/ViewUserServlet")
 public class ViewUserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
 	public ViewUserServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		ViewUser user = new ViewUser(request.getParameter("username"), request.getParameter("firstnames"),
@@ -38,5 +27,4 @@ public class ViewUserServlet extends HttpServlet {
 		session.setAttribute("viewuser", user);
 		request.getRequestDispatcher("viewuser.jsp").forward(request, response);
 	}
-
 }

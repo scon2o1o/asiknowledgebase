@@ -13,11 +13,12 @@ import myApp.CategoryDAO;
 public class EditCategoryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-    public EditCategoryServlet() {
-        super();
-    }
+	public EditCategoryServlet() {
+		super();
+	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		CategoryDAO.instance.editCategory(request.getParameter("category"), request.getParameter("newname"));
 		request.getRequestDispatcher("admin.jsp").forward(request, response);
 	}

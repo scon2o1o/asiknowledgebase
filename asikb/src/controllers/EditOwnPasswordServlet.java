@@ -17,7 +17,8 @@ public class EditOwnPasswordServlet extends HttpServlet {
 		super();
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		UserDAO.instance.editUserPassword(request.getParameter("username"), request.getParameter("password"));
 		request.getRequestDispatcher("index.jsp").forward(request, response);
 	}

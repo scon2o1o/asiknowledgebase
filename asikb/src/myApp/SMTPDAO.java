@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dao.Email;
 import dao.Utils;
 
 public enum SMTPDAO {
@@ -24,17 +25,17 @@ public enum SMTPDAO {
 		smtpMap.clear();
 		try {
 			Connection connection = Utils.getConnection();
-
-			PreparedStatement psmt = connection.prepareStatement("SELECT smtpserver, smtpport, smtpauth, smtpstarttls, smtpfromaddress, smtpusername, smtppassword  FROM sysinfo");
-
+			PreparedStatement psmt = connection.prepareStatement(
+					"SELECT smtpserver, smtpport, smtpauth, smtpstarttls, smtpfromaddress, smtpusername, smtppassword  FROM sysinfo");
 			ResultSet rs = psmt.executeQuery();
-
 			while (rs.next()) {
-				SMTP u = new SMTP(rs.getString("smtpserver"), rs.getInt("smtpport"), rs.getString("smtpauth"), rs.getString("smtpstarttls"), rs.getString("smtpfromaddress"), rs.getString("smtpusername"), rs.getString("smtppassword"));
+				SMTP u = new SMTP(rs.getString("smtpserver"), rs.getInt("smtpport"), rs.getString("smtpauth"),
+						rs.getString("smtpstarttls"), rs.getString("smtpfromaddress"), rs.getString("smtpusername"),
+						rs.getString("smtppassword"));
 				smtpMap.put(smtpMap.size() + 1, u);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to load SMTP details from the database", e.getMessage());
 		}
 		return smtpMap;
 	}
@@ -45,11 +46,12 @@ public enum SMTPDAO {
 		return smtp;
 	}
 
-	public void editSMTPSettings(String server, int port, String auth, String starttls, String fromaddress, String username, String password) {
+	public void editSMTPSettings(String server, int port, String auth, String starttls, String fromaddress,
+			String username, String password) {
 		Connection connection = Utils.getConnection();
-
 		try {
-			PreparedStatement psmt = connection.prepareStatement("UPDATE sysinfo SET smtpserver = ?, smtpport = ?, smtpauth = ?, smtpstarttls = ?, smtpfromaddress = ?, smtpusername = ?, smtppassword = ?");
+			PreparedStatement psmt = connection.prepareStatement(
+					"UPDATE sysinfo SET smtpserver = ?, smtpport = ?, smtpauth = ?, smtpstarttls = ?, smtpfromaddress = ?, smtpusername = ?, smtppassword = ?");
 			psmt.setString(1, server);
 			psmt.setInt(2, port);
 			psmt.setString(3, auth);
@@ -60,7 +62,7 @@ public enum SMTPDAO {
 			psmt.executeUpdate();
 			loadFromDB();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Email.instance.sendErrorEmail(e, "Failed to edit SMTP detais", e.getMessage());
 		}
 	}
 

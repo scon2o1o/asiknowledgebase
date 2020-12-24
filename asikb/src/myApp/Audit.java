@@ -10,7 +10,7 @@ public class Audit {
 	private String datetime;
 	private String action;
 	private String user;
-	
+
 	public Audit(String timestamp, String action, String user) {
 		super();
 		this.datetime = timestamp;
@@ -51,7 +51,5 @@ public class Audit {
 	public void setUser(String user) {
 		this.user = user;
 	}
-	
-	
 
 }
